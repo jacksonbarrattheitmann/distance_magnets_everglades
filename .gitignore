@@ -47,3 +47,10 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+.positai
+
+# EdenR data
+Data/eden/
+
+# GEE data
+Data/GEE_Everglades_Landcover/
