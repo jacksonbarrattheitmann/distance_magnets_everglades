@@ -6,6 +6,7 @@ library(lubridate)
 library(tsibble)
 library(sf)
 library(usmap)
+library(purrr)
 
 ## here's some test data, so we can create the pipeline
 ## then fix it later with all of the data
@@ -69,20 +70,20 @@ temp_ebird <- ebird_state %>%
          year = floor_date(`OBSERVATION DATE`, unit = "year"))
 
 temp_ebird2 <- temp_ebird %>%
-  group_by(LOCALITY_ID, year, month) %>%
+  group_by(LOCALITY_ID, COMMON_NAME, year, month) %>%
   summarize(checks_mon_yr = n_distinct(`SAMPLING EVENT IDENTIFIER`)) %>%
   ungroup()
 
 
 temp_ebird3 <- temp_ebird2 %>%
-  group_by(LOCALITY_ID, year) %>%
+  group_by(LOCALITY_ID, year, COMMON_NAME) %>%
   summarize(n_month_sampled = n_distinct(month)) %>%
   ungroup()
 
 ## now let's calculate how many year x hotspots combos have at least 1 year of data
 temp_ebird_yr <- temp_ebird3 %>%
   filter(n_month_sampled == 12) %>%
-  group_by(LOCALITY_ID) %>%
+  group_by(LOCALITY_ID, COMMON_NAME) %>%
   summarize(total_yrs = n_distinct(year))
 
 ## Now why don;t we just take hotspots with at least 5 years with of data from every month
@@ -122,7 +123,6 @@ ebird_summary <- ebird_state %>%
   filter(year > "2015-12-31") %>%
   group_by(LOCALITY_ID, COMMON_NAME, month, year, `STATE CODE`) %>%
   summarise(max_n = max(OBSERVATION_COUNT, na.rm = TRUE))
-
 
 ## now some regional high counts
 ebird_summary_region <- ebird_state %>%

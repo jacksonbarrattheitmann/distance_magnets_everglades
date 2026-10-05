@@ -26,6 +26,10 @@ subregions <- read_sf("../../wader_data/EvergladesWadingBird/SiteandMethods/regi
 
 colonies <- read_sf("../../wader_data/EvergladesWadingBird/SiteandMethods/colonies/colonies.geojson")
 
+colonies_csv <- read_csv("../../wader_data/EvergladesWadingBird/SiteandMethods/colonies.csv") %>%
+  rename(Name = colony) %>%
+  select(Name, region, subregion)
+
 eden_water <- get_eden_covariates(eden_path = "Data/eden/", level = "colonies", 
                                   years = c(2015:2026))
 
@@ -90,6 +94,41 @@ combined_long$buffer_size_m <- as.factor(combined_long$buffer_size_m)
 saveRDS(combined_long, "Data/gee_combined_lulc.RDS")
 
 combined_long <- readRDS("Data/gee_combined_lulc.RDS")
+
+
+### let's aggregate this data for Alex quickly
+
+gee_summaries <- combined_long %>%
+  filter(buffer_size_m == 2500) %>%
+  left_join(colonies_csv, by = "Name") %>%
+  ungroup()
+
+region_summaries <- gee_summaries %>%
+  select(Name, region, subregion, land_cover, date, value) %>%
+  group_by(region, date, land_cover) %>%
+  summarize(mean_land_cover_region = mean(value, na.rm = TRUE),
+            sd_land_cover_region = sd(value, na.rm = TRUE)) %>%
+  ungroup()
+
+## save to send to Alex
+#saveRDS(region_summaries, "Data/For_alex/region_summaries.RDS")
+
+###we're getting NAs and I'm not sure why, let's investigate
+region_summaries %>%
+  filter(is.na(mean_land_cover_region) | is.na(sd_land_cover_region))
+### 
+### it's because the 'other' region has NA values in for sd in 2017-04-01
+### probably because there is only one value
+
+
+subregion_summaries <- gee_summaries %>%
+  select(Name, region, subregion, land_cover, date, value) %>%
+  group_by(subregion, date, land_cover) %>%
+  summarize(mean_land_cover_subregion = mean(value, na.rm = TRUE),
+            sd_land_cover_subregion = sd(value, na.rm = TRUE))
+
+## save to send to Alex
+#saveRDS(subregion_summaries, "Data/For_alex/subregion_summaries.RDS")
 
 
 ### Joining the water depth data
