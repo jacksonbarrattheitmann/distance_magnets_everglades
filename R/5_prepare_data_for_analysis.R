@@ -5,11 +5,13 @@ library(readr)
 library(tidyverse)
 
 ## eBird
+ebird <- readRDS("Data/for_analysis/ebird_metrics.RDS")
 
-ebird <- readRDS("Data/eBird_test/eBird_clean.RDS")
+## eBird effort data
+agg <- readRDS("Data/for_analysis/agg_dataframe.RDS")
 
 ## land cover + edenR
-lulc <- readRDS("Data/land_cover_eden.RDS")
+lulc <- readRDS("Data/for_analysis/land_cover_eden.RDS")
 
 ## wading_bird_data
-wading <- read.csv("../../wader_data/EvergladesWadingBird/Counts/image_counts.csv")
+wading <- readRDS("Data/for_analysis/wading_bird_EV.RDS")
