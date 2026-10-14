@@ -83,7 +83,9 @@ n_distinct(groups$`GROUP IDENTIFIER`)
 ebird_state <- rbind(non_groups, groups)
 
 
-saveRDS(ebird_state, "Data/eBird_test/eBird_clean.RDS")
+#saveRDS(ebird_state, "Data/eBird_test/eBird_clean.RDS")
+
+ebird_state <- readRDS("Data/eBird_test/eBird_clean.RDS")
 
 ### We now from other work that both Max Count and Average Max Count can be good 
 ### proxy measures for wading bird abundance. 
@@ -136,6 +138,16 @@ ebird_metrics <- ebird_sum %>%
 ## Saving this object for our analysis script
 #saveRDS(ebird_metrics, "Data/eBird_test/ebird_metrics.RDS")
 
+
+## we also just need a df that has the STATE_CODE and the LOCALITY_ID
+
+ebird_env <- ebird_state %>%
+  select(LOCALITY_ID, `STATE CODE`) %>%
+  distinct(LOCALITY_ID, .keep_all = TRUE) %>%
+  rename(STATE_CODE = `STATE CODE`)
+
+# save this for prepare data anlysis
+#saveRDS(ebird_env, "Data/for_analysis/ebird_env.RDS")
 
 ##### MAP OF HOTSPOTS #######
 ## Now let's see if we can just plot where these hotspots are spatially

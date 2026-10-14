@@ -2,7 +2,6 @@
 
 library(dplyr)
 library(readr)
-remotes::install_github("jacksonbarrattheitmann/edenR@jackson-function-rewrite")
 library(terra)
 library(stars)
 library(wader)
